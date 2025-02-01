@@ -1,9 +1,7 @@
 package com.example.model
 
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 enum class Frequency {
@@ -16,7 +14,7 @@ data class Habit(
     var name: String,
     var description: String? = null,  // optional
     var frequency: Frequency,
-    var startDate: String,
+    var startDate: LocalDate,
     val entries: MutableList<Entry> = mutableListOf()
 )
 
@@ -25,5 +23,5 @@ data class HabitUpdateRequest(
     val name: String? = null,
     val description: String? = null,
     val frequency: Frequency? = null,
-    val startDate: String? = null
+    val startDate: LocalDate? = null
 )

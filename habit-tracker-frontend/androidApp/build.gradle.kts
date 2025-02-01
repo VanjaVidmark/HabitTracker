@@ -50,5 +50,6 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation.compose.v274)
+    implementation(libs.kotlinx.datetime)
     debugImplementation(libs.compose.ui.tooling)
 }

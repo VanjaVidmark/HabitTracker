@@ -2,7 +2,6 @@ package com.example.habittrackerfrontend.habits
 
 import co.touchlab.skie.configuration.annotations.SuspendInterop
 import com.example.habittrackerfrontend.BaseViewModel
-import com.example.habittrackerfrontend.entries.Entry
 import com.example.habittrackerfrontend.entries.EntryAddRequest
 import com.example.habittrackerfrontend.logMessage
 import io.ktor.client.HttpClient
@@ -13,8 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
-import kotlin.random.Random
 
 class HabitsViewModel: BaseViewModel() {
     // the list of values are kept at habitsState.value.habits
@@ -64,7 +63,7 @@ class HabitsViewModel: BaseViewModel() {
                 name = name,
                 description = description.ifEmpty { null },
                 frequency = frequency,
-                startDate = startDate
+                startDate = LocalDate.parse(startDate)
             )
             // not sure this will trigger automatic reload of habits, maybe i manually have to set habitsState.value
             try {
@@ -77,10 +76,22 @@ class HabitsViewModel: BaseViewModel() {
     }
 
     @SuspendInterop.Enabled
+    suspend fun deleteHabit(habitId: String) {
+        scope.launch {
+            try {
+                service.deleteHabit(habitId)
+                getHabits()
+            } catch (e: Exception) {
+                println("Error deleting habit: ${e.message}")
+            }
+        }
+    }
+
+    @SuspendInterop.Enabled
     suspend fun addEntry(habitId: String, timestamp: String, note: String) {
         scope.launch {
             val entryAddRequest = EntryAddRequest(
-                timestamp = timestamp,
+                timestamp = LocalDate.parse(timestamp),
                 note = note.ifEmpty { null }
             )
             try {
@@ -88,6 +99,18 @@ class HabitsViewModel: BaseViewModel() {
                 getHabits()
             } catch (e: Exception) {
                 println("Error adding entry: ${e.message}")
+            }
+        }
+    }
+
+    @SuspendInterop.Enabled
+    suspend fun deleteEntry(entryId: String) {
+        scope.launch {
+            try {
+                service.deleteEntry(entryId)
+                getHabits()
+            } catch (e: Exception) {
+                println("Error deleting entry: ${e.message}")
             }
         }
     }

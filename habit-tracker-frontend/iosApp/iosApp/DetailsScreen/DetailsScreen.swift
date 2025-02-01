@@ -12,7 +12,10 @@ import shared
 struct DetailsScreen: View {
     let habitId: String
     @ObservedObject var viewModel: HabitsViewModelWrapper
+    var onBack: () -> Void
+    
     @State private var showAddEntryDialog = false
+    @State private var showDeleteHabitDialog = false
     
     var habit: Habit? {
             viewModel.habits.first { $0.id == habitId }
@@ -36,6 +39,17 @@ struct DetailsScreen: View {
                             .padding()
                     } else {
                         EntriesList(entries: habit.entries)
+                    }
+                    Spacer()
+                    Button(action: { showDeleteHabitDialog = true }) {
+                        Text("Delete Habit")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding(.horizontal)
                     }
                 } else {
                     Text("Habit not found")
@@ -67,6 +81,17 @@ struct DetailsScreen: View {
                 )
             }
         }
+        .sheet(isPresented: $showDeleteHabitDialog) {
+            if let habit = habit {
+                DeleteHabitDialog(
+                    isPresented: $showDeleteHabitDialog,
+                    onYes: {
+                        viewModel.deleteHabit(habitId: habit.id)
+                        onBack()
+                    }
+                )
+            }
+        }
         .navigationTitle(habit?.name ?? "Habit Details")
     }
 }
@@ -88,7 +113,7 @@ struct EntryItem: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Date: \(entry.timestamp)")
                 .font(.headline)
-            Text(entry.note ?? " ")
+            Text(entry.note)
                 .font(.subheadline)
                 .foregroundColor(.gray)
             Divider()

@@ -15,6 +15,7 @@
 		D814835F2D4BAB1B001DD505 /* AddHabitDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D814835E2D4BAB1B001DD505 /* AddHabitDialog.swift */; };
 		D81483692D4BD24F001DD505 /* DetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81483682D4BD24F001DD505 /* DetailsScreen.swift */; };
 		D814836B2D4BD40B001DD505 /* AddEntryDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D814836A2D4BD40B001DD505 /* AddEntryDialog.swift */; };
+		D814836D2D4ED89E001DD505 /* DeleteHabitDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D814836C2D4ED89E001DD505 /* DeleteHabitDialog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +42,7 @@
 		D814835E2D4BAB1B001DD505 /* AddHabitDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHabitDialog.swift; sourceTree = "<group>"; };
 		D81483682D4BD24F001DD505 /* DetailsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsScreen.swift; sourceTree = "<group>"; };
 		D814836A2D4BD40B001DD505 /* AddEntryDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryDialog.swift; sourceTree = "<group>"; };
+		D814836C2D4ED89E001DD505 /* DeleteHabitDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteHabitDialog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +116,7 @@
 			children = (
 				D81483682D4BD24F001DD505 /* DetailsScreen.swift */,
 				D814836A2D4BD40B001DD505 /* AddEntryDialog.swift */,
+				D814836C2D4ED89E001DD505 /* DeleteHabitDialog.swift */,
 			);
 			path = DetailsScreen;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				D814836B2D4BD40B001DD505 /* AddEntryDialog.swift in Sources */,
 				D814835F2D4BAB1B001DD505 /* AddHabitDialog.swift in Sources */,
+				D814836D2D4ED89E001DD505 /* DeleteHabitDialog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

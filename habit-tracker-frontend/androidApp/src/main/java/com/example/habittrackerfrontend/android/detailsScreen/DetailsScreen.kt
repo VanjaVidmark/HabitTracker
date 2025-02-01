@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.habittrackerfrontend.android.utilities.ErrorMessage
 import com.example.habittrackerfrontend.entries.Entry
-import com.example.habittrackerfrontend.habits.Habit
 import com.example.habittrackerfrontend.habits.HabitsViewModel
 import com.example.habittrackerfrontend.logMessage
 
@@ -26,7 +25,8 @@ fun DetailsScreen(
     habitsViewModel: HabitsViewModel,
     onBack: () -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var showDeleteHabitDialog by remember { mutableStateOf(false) }
 
     // find habit of given id
     val habitsState = habitsViewModel.habitsState.collectAsState()
@@ -48,31 +48,53 @@ fun DetailsScreen(
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { showDialog = true }) {
+                FloatingActionButton(onClick = { showAddDialog = true }) {
                     Icon(Icons.Filled.Add, contentDescription = "Add Habit")
                 }
             }
         ) { padding ->
-            Column(modifier = Modifier.padding(padding).fillMaxSize()) {
-                EntriesList(habit.entries)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()) {
+
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                    items(habit.entries) { entry ->
+                        EntryItem(entry)
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    item {
+                        Button(
+                            onClick = { showDeleteHabitDialog = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(18.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Delete Habit")
+                        }
+                    }
+                }
             }
         }
+
         // Show the Add Habit Dialog
-        if (showDialog) {
+        if (showAddDialog) {
             AddEntryDialog(
                 habitId = habit.id,
                 habitsViewModel = habitsViewModel,
-                onDismiss = { showDialog = false }
+                onDismiss = { showAddDialog = false }
             )
         }
-    }
-}
-
-@Composable
-fun EntriesList(entries: List<Entry>) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        items(entries) { entry ->
-            EntryItem(entry)
+        if (showDeleteHabitDialog) {
+            DeleteHabitDialog(
+                habitId = habit.id,
+                habitsViewModel = habitsViewModel,
+                onDismiss = { showDeleteHabitDialog = false },
+                onBack = { onBack() }
+            )
         }
     }
 }

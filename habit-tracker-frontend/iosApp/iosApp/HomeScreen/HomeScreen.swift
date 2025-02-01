@@ -68,7 +68,9 @@ struct HomeScreen: View {
                 AddHabitDialog(isPresented: $showAddHabitDialog, onSave: viewModel.addHabit)
             }
             .navigationDestination(item: $selectedHabit) { habit in
-                DetailsScreen(habitId: habit.id, viewModel: viewModel)
+                DetailsScreen(habitId: habit.id, viewModel: viewModel, onBack:{
+                    selectedHabit = nil
+                })
                     .onDisappear{
                         selectedHabit = nil
                     }
@@ -130,6 +132,18 @@ class HabitsViewModelWrapper: ObservableObject {
                 } catch {
                     await MainActor.run {
                         self.errorMessage = "Failed to add entry."
+                    }
+                }
+            }
+        }
+    
+    func deleteHabit(habitId: String) {
+            Task {
+                do {
+                    try await viewModel.deleteHabit(habitId: habitId)
+                } catch {
+                    await MainActor.run {
+                        self.errorMessage = "Failed to delete habit."
                     }
                 }
             }

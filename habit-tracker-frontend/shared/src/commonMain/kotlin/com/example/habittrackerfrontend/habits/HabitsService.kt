@@ -7,6 +7,7 @@ import com.example.habittrackerfrontend.entries.EntryRaw
 import com.example.habittrackerfrontend.logMessage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -42,6 +43,15 @@ class HabitsService(
         }
     }
 
+    suspend fun deleteHabit(habitId: String) {
+        try {
+            httpClient.delete("$BASE_URL/habits/$habitId")
+        } catch (e: Exception) {
+            println("Failed to add habit: ${e.message}")
+            throw e
+        }
+    }
+
     suspend fun addEntry(habitId: String, entryRequest: EntryAddRequest) {
         try {
             httpClient.post("$BASE_URL/habits/$habitId/tracking") {
@@ -50,6 +60,15 @@ class HabitsService(
             }
         } catch (e: Exception) {
             println("Failed to add entry: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun deleteEntry(entryId: String) {
+        try {
+            httpClient.delete("$BASE_URL/habits/$entryId/tracking")
+        } catch (e: Exception) {
+            println("Failed to add habit: ${e.message}")
             throw e
         }
     }

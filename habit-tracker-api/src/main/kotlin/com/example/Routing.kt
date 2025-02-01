@@ -14,20 +14,20 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 
-fun Application.configureRouting() {
+fun Application.configureRouting(repository: HabitRepository) {
     routing {
         staticResources("static", "static")
 
         route("/habits") {
             get {
-                call.respond(HabitRepository.getAllHabits())
+                call.respond(repository.getAllHabits())
                 return@get
             }
 
             post {
                 try {
                     val habit = call.receive<Habit>()
-                    HabitRepository.addHabit(habit)
+                    repository.addHabit(habit)
                     call.respond(HttpStatusCode.NoContent)
                 } catch (ex: IllegalStateException) {
                     call.respond(HttpStatusCode.BadRequest)
@@ -44,7 +44,7 @@ fun Application.configureRouting() {
                         call.respond(HttpStatusCode.BadRequest, "Missing habitId")
                         return@get
                     }
-                    val habit = HabitRepository.habitById(id)
+                    val habit = repository.habitById(id)
                     if (habit == null) {
                         call.respond(HttpStatusCode.NotFound, "Habit not found")
                         return@get
@@ -58,33 +58,34 @@ fun Application.configureRouting() {
                         return@delete
                     }
 
-                    if (HabitRepository.removeHabit(id)) {
+                    if (repository.removeHabit(id)) {
                         call.respond(HttpStatusCode.NoContent)
                     } else {
                         call.respond(HttpStatusCode.NotFound)
                     }
                 }
+                /*
                 patch {
                     val id = call.parameters["habitId"]
                     if (id == null) {
                         call.respond(HttpStatusCode.BadRequest, "Missing habitId")
                         return@patch
                     }
-                    val habit = HabitRepository.habitById(id)
+                    val habit = repository.habitById(id)
                     if (habit == null) {
                         call.respond(HttpStatusCode.NotFound, "Habit not found")
                         return@patch
                     }
                     try {
                         val updateRequest = call.receive<HabitUpdateRequest>()
-                        HabitRepository.editHabit(habit, updateRequest)
+                        repository.editHabit(habit, updateRequest)
                         call.respond(HttpStatusCode.NoContent)
                     } catch (ex: IllegalStateException) {
                         call.respond(HttpStatusCode.BadRequest)
                     } catch (ex: JsonConvertException) {
                         call.respond(HttpStatusCode.BadRequest)
                     }
-                }
+                }*/
 
                 route("/tracking") {
                     post {
@@ -93,14 +94,14 @@ fun Application.configureRouting() {
                             call.respond(HttpStatusCode.BadRequest, "Missing habitId")
                             return@post
                         }
-                        val habit = HabitRepository.habitById(id)
+                        val habit = repository.habitById(id)
                         if (habit == null) {
                             call.respond(HttpStatusCode.NotFound, "Habit not found")
                             return@post
                         }
                         try {
                             val entry = call.receive<Entry>()
-                            EntryRepository.addEntry(habit, entry)
+                            repository.addEntry(habit, entry)
                             call.respond(HttpStatusCode.NoContent)
                         } catch (ex: IllegalStateException) {
                             call.respond(HttpStatusCode.BadRequest)
