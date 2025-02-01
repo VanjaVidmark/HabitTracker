@@ -9,8 +9,7 @@ import java.util.*
 @Serializable
 data class Entry(
     val id: String = UUID.randomUUID().toString(),
-    val habitId: String,
     var note: String? = null,  // optional
-    var timestamp: String = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+    var timestamp: String
 )
 

@@ -16,7 +16,8 @@ data class Habit(
     var name: String,
     var description: String? = null,  // optional
     var frequency: Frequency,
-    var startDate: String = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+    var startDate: String,
+    val entries: MutableList<Entry> = mutableListOf()
 )
 
 @Serializable

@@ -9,6 +9,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.*
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 
 fun Application.configureRouting() {
@@ -98,31 +101,17 @@ fun Application.configureRouting() {
                         try {
                             val body = call.receive<Map<String, String>>()
                             val entry = if (body.containsKey("note") && body["note"] != null) {
-                                Entry(habitId = id, note = body["note"])
+                                Entry(timestamp = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT), note = body["note"])
                             } else {
-                                Entry(habitId = id)
+                                Entry(timestamp = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT))
                             }
-                            EntryRepository.addEntry(entry)
+                            EntryRepository.addEntry(habit, entry)
                             call.respond(HttpStatusCode.NoContent)
                         } catch (ex: IllegalStateException) {
                             call.respond(HttpStatusCode.BadRequest)
                         } catch (ex: JsonConvertException) {
                             call.respond(HttpStatusCode.BadRequest)
                         }
-                    }
-                    get {
-                        val id = call.parameters["habitId"]
-                        if (id == null) {
-                            call.respond(HttpStatusCode.BadRequest, "Missing habitId")
-                            return@get
-                        }
-                        val habit = HabitRepository.habitById(id)
-                        if (habit == null) {
-                            call.respond(HttpStatusCode.NotFound, "Habit not found")
-                            return@get
-                        }
-                        call.respond(EntryRepository.getHabitEntries(id))
-                        return@get
                     }
                 }
 
