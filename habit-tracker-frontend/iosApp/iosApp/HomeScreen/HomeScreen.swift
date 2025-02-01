@@ -93,6 +93,9 @@ class HabitsViewModelWrapper: ObservableObject {
     @MainActor
     func activate() async {
         for await newState in viewModel.observeHabits() {
+            logMessage(tag: "Swift", message: "Fetching habits from API")
+            logMessage(tag: "Swift", message: String(newState.habits.count))
+
             self.habits = newState.habits
             self.isLoading = newState.loading
             self.errorMessage = newState.error

@@ -8,3 +8,16 @@ data class Entry (
     val timestamp: String,
     val note: String
 )
+
+@Serializable
+data class EntryRaw (
+    val id: String,
+    val timestamp: String,
+    val note: String?
+)
+
+@Serializable
+data class EntryAddRequest (
+    val timestamp: String,
+    val note: String? = null
+)

@@ -16,6 +16,7 @@ import com.example.habittrackerfrontend.android.utilities.ErrorMessage
 import com.example.habittrackerfrontend.entries.Entry
 import com.example.habittrackerfrontend.habits.Habit
 import com.example.habittrackerfrontend.habits.HabitsViewModel
+import com.example.habittrackerfrontend.logMessage
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +31,7 @@ fun DetailsScreen(
     // find habit of given id
     val habitsState = habitsViewModel.habitsState.collectAsState()
     val habit = habitsState.value.habits.find { it.id == habitId }
+    logMessage("andriod", "habit: $habit")
 
     if (habit == null) {
         ErrorMessage("Habit not found")

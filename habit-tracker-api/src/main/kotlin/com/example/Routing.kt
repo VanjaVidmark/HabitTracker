@@ -99,12 +99,7 @@ fun Application.configureRouting() {
                             return@post
                         }
                         try {
-                            val body = call.receive<Map<String, String>>()
-                            val entry = if (body.containsKey("note") && body["note"] != null) {
-                                Entry(timestamp = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT), note = body["note"])
-                            } else {
-                                Entry(timestamp = Instant.now().atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT))
-                            }
+                            val entry = call.receive<Entry>()
                             EntryRepository.addEntry(habit, entry)
                             call.respond(HttpStatusCode.NoContent)
                         } catch (ex: IllegalStateException) {
