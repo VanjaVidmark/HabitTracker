@@ -14,11 +14,23 @@ struct HomeScreen: View {
     @StateObject private var viewModel = HabitsViewModelWrapper()
     @State private var showAddHabitDialog = false
     @State private var selectedHabit: Habit? = nil
+    @State private var selectedFilter: String = "Today"
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 VStack {
+                    
+                    Picker("Select View", selection: $selectedFilter) {
+                        Text("Today").tag("Today")
+                        Text("Upcoming").tag("Upcoming")
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding()
+                    .onChange(of: selectedFilter) { newFilter in
+                        viewModel.editFilter(filter: newFilter)
+                    }
+                    
                     if viewModel.isLoading {
                         ProgressView()
                             .padding()
@@ -102,6 +114,10 @@ class HabitsViewModelWrapper: ObservableObject {
             self.isLoading = newState.loading
             self.errorMessage = newState.error
         }
+    }
+    
+    func editFilter(filter: String) {
+        viewModel.editFilter(filter: filter)
     }
     
     func addHabit(name: String, description: String, frequency: String, startDate: String) {

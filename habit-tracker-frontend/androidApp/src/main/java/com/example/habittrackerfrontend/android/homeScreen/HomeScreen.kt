@@ -32,6 +32,7 @@ fun HomeScreen(
     ) {
     val habitsState = habitsViewModel.habitsState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableStateOf(habitsViewModel.filterValue) }
 
     Scaffold(
         topBar = { AppBar() },
@@ -42,6 +43,27 @@ fun HomeScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
+            // SELECTOR
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                listOf("Today", "Upcoming").forEach { tab ->
+                    Button(
+                        onClick = {
+                            selectedTab = tab
+                            habitsViewModel.editFilter(tab) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedTab == tab) MaterialTheme.colorScheme.primary else Color.Gray
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = tab)
+                    }
+                }
+            }
             if (habitsState.value.loading) Loader()
             if (habitsState.value.error != null) ErrorMessage(habitsState.value.error!!)
             if (habitsState.value.habits.isNotEmpty()) HabitsListView(habitsState.value.habits, navController)

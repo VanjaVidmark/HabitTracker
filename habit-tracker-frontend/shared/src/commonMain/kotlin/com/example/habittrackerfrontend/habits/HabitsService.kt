@@ -19,12 +19,11 @@ class HabitsService(
 ) {
     val BASE_URL = Platform.getBaseUrl()
 
-
-    suspend fun fetchHabits(): List<Habit> {
+    suspend fun fetchHabits(): List<HabitRaw> {
         try {
             val response = httpClient.get("$BASE_URL/habits")
             logMessage("Service", "received response: ${response.status}")
-            return mapHabits(response.body())
+            return response.body()
         } catch (e: Exception) {
             logMessage("Service", "Error in fetchHabits: ${e.message}")
             return emptyList()
@@ -70,29 +69,6 @@ class HabitsService(
         } catch (e: Exception) {
             println("Failed to add habit: ${e.message}")
             throw e
-        }
-    }
-
-    private fun mapHabits(habitsRaw: List<HabitRaw>): List<Habit> {
-        return habitsRaw.map { raw ->
-            Habit(
-                raw.id,
-                raw.name,
-                raw.description ?: "",
-                raw.frequency,
-                raw.startDate,
-                mapEntries(raw.entries)
-            )
-        }
-    }
-
-    private fun mapEntries(entriesRaw: List<EntryRaw>): List<Entry> {
-        return entriesRaw.map { raw ->
-            Entry(
-                raw.id,
-                raw.timestamp,
-                raw.note ?: ""
-            )
         }
     }
 }
