@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 
@@ -23,9 +22,11 @@ class HabitsViewModel: BaseViewModel() {
     private val _habitsState: MutableStateFlow<HabitsState> = MutableStateFlow(HabitsState(loading = true))
     val habitsState: StateFlow<HabitsState> = _habitsState.asStateFlow()
 
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message.asStateFlow()
+
     private var todaysHabits: List<Habit> = listOf()
     private var upcomingHabits: List<Habit> = listOf()
-
     private val service: HabitsService
     private val useCase: HabitsUseCase
     var filterValue: String = "Today"
@@ -60,7 +61,9 @@ class HabitsViewModel: BaseViewModel() {
         scope.launch {
             try {
                 val fetched = useCase.getHabits()
-                val todays = filterTodaysHabits(fetched)
+                val todays = fetched.filter { habit ->
+                    habit.daysSinceDue >= 0
+                }
 
                 logMessage("Shared", "Fetched habits count: ${fetched.size}")
                 todaysHabits = todays
@@ -70,6 +73,8 @@ class HabitsViewModel: BaseViewModel() {
                 if (filterValue == "Today") _habitsState.value = HabitsState(habits = todaysHabits)
                 else _habitsState.value = HabitsState(habits = upcomingHabits)
 
+                updateMessage()
+
             } catch (e: Exception) {
                 logMessage("Shared", "Error fetching habits: ${e.message}")
                 _habitsState.value = HabitsState(error = "Failed to fetch habits")
@@ -77,19 +82,35 @@ class HabitsViewModel: BaseViewModel() {
         }
     }
 
-    private fun filterTodaysHabits(habits: List<Habit>): List<Habit> {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    private fun updateMessage() {
+        val habitsAmount = _habitsState.value.habits.size
+        _message.value = when {
+            filterValue == "Today" && habitsAmount == 0 -> "Well done! You're all done for today 🎉"
+            filterValue == "Today" && habitsAmount == 1 -> "Just one habit left, keep going!"
+            filterValue == "Today" && habitsAmount > 1 -> "You have $habitsAmount habits left today, keep up the good work!"
+            filterValue == "Upcoming" && habitsAmount == 0 -> "You have no upcoming habits, add some today!"
+            filterValue == "Upcoming" && habitsAmount == 1 -> "Just one upcoming habit, keep going!"
+            else -> "You have $habitsAmount upcoming habits, you are doing a great job!"
+        }
+    }
 
-        return habits.filter { habit ->
-            val lastEntryDate = habit.entries.maxByOrNull { it.timestamp }?.timestamp ?: habit.startDate
-            val daysAgo = lastEntryDate.daysUntil(today)
-            logMessage("viewmodel", "lastEntryDate: $lastEntryDate")
-            when (habit.frequency) {
-                "Daily" -> daysAgo >= 1
-                "Weekly" -> daysAgo >= 7
-                "Monthly" -> daysAgo >= 30
-                else -> false
-            }
+    fun getGreeting(): String {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return when (now.hour) {
+            in 5..11 -> "Good morning!"
+            in 12..17 -> "Good afternoon!"
+            in 18..22 -> "Good evening!"
+            else -> "Good night!"
+        }
+    }
+
+    fun getDueMessage(habit: Habit): String {
+        return when  {
+            habit.daysSinceDue == 0 -> "Today"
+            habit.daysSinceDue == 1 -> "Due yesterday"
+            habit.daysSinceDue > 2 -> "Due ${habit.daysSinceDue} days ago"
+            habit.daysSinceDue == -1 -> "Due tomorrow"
+            else -> "In ${habit.daysSinceDue * -1} days"
         }
     }
 

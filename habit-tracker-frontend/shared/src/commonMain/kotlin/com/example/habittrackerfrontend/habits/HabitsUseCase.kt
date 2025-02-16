@@ -26,7 +26,8 @@ class HabitsUseCase (
                 raw.description ?: "",
                 raw.frequency,
                 raw.startDate,
-                mapEntries(raw.entries)
+                mapEntries(raw.entries),
+                calcDaysSinceDue(raw)
             )
         }
     }
@@ -40,4 +41,22 @@ class HabitsUseCase (
             )
         }
     }
+    private fun calcDaysSinceDue(habitRaw: HabitRaw): Int {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val lastEntryDate = habitRaw.entries.maxByOrNull { it.timestamp }?.timestamp
+
+        if (lastEntryDate == null) {
+            // inga entries, den var alltså due för lika många dagar sedan som habiten skapades
+            return habitRaw.startDate.daysUntil(today)
+        }
+
+        val daysSinceEntry = lastEntryDate.daysUntil(today)
+        return when (habitRaw.frequency) {
+            "Daily" -> daysSinceEntry - 1
+            "Weekly" -> daysSinceEntry - 7
+            "Monthly" -> daysSinceEntry - 30
+            else -> 0
+        }
+    }
+
 }

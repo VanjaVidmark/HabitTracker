@@ -12,7 +12,8 @@ data class Habit (
     var description: String,
     var frequency: String,
     var startDate: LocalDate,
-    var entries: List<Entry> = listOf()
+    var entries: List<Entry> = listOf(),
+    val daysSinceDue: Int // negative if due in the future
 )
 
 @Serializable
